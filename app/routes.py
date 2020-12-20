@@ -23,7 +23,9 @@ def index():
 
 @app.route("/login/")
 def login():
-    """Log user into Spotify"""
+    """
+    Routes user to unique authorization URL. Redirects back to app via redirect_uri
+    """
     auth_manager = SpotifyOAuth(
         client_id=app.config["SPOTIPY_CLIENT_ID"],
         client_secret=app.config["SPOTIPY_CLIENT_SECRET"],
@@ -38,15 +40,23 @@ def login():
 
 @app.route("/callback/")
 def code_generation():
-    """Generates token from code in browser"""
-    code = re.search(r"code=(.*)", request.environ["QUERY_STRING"]).group(1)
-    auth_manager = auth_manager=SpotifyOAuth(
-        client_id=app.config["SPOTIPY_CLIENT_ID"],
-        client_secret=app.config["SPOTIPY_CLIENT_SECRET"],
-        redirect_uri=app.config["SPOTIPY_REDIRECT_URI"],
-        scope=app.config["SCOPE"]
+    """
+    Authenticates app via response URL assigned to app (in Spotify), allowing access to code
+    and giving user information.
+    """
+    sp = Spotify(
+        auth_manager=SpotifyOAuth(
+            client_id=app.config["SPOTIPY_CLIENT_ID"],
+            client_secret=app.config["SPOTIPY_CLIENT_SECRET"],
+            redirect_uri=app.config["SPOTIPY_REDIRECT_URI"],
+            scope=app.config["SCOPE"]
+        )
     )
-    token = auth_manager.get_access_token()
-    s = Spotify(auth=token)
 
-    return render_template("callback.html")
+    # Get some user information to display
+    user_info = sp.current_user()
+
+    return render_template(
+        "callback.html",
+        user_info=user_info
+    )
