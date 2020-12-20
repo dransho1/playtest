@@ -8,10 +8,6 @@ from flask import (
 import re
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
-from spotipy import (
-    Spotify
-)
-import webbrowser
 
 from app import app
 
@@ -55,6 +51,8 @@ def code_generation():
 
     # Get some user information to display
     user_info = sp.current_user()
+
+    # Get the user's top track from their "Your Songs" list
 
     return render_template(
         "callback.html",
