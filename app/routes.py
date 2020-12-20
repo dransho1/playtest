@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from flask import (
     redirect,
     render_template,
@@ -5,49 +6,47 @@ from flask import (
     session,
 )
 import re
+from spotipy import Spotify
+from spotipy.oauth2 import SpotifyOAuth
 from spotipy import (
-    Credentials,
-    scopes,
-    Scope,
     Spotify
 )
 import webbrowser
 
 from app import app
 
-@app.route('/')
+@app.route("/")
 def index():
     """Display homepage w/login link"""
-    return render_template('index.html', title='Home')
+    return render_template("index.html", title="Home")
 
 
-@app.route('/login/')
+@app.route("/login/")
 def login():
     """Log user into Spotify"""
-    c = Credentials(
-        app.config['CLIENT_ID'],
-        app.config['CLIENT_SECRET'],
-        app.config['REDIRECT_URI']
+    auth_manager = SpotifyOAuth(
+        client_id=app.config["SPOTIPY_CLIENT_ID"],
+        client_secret=app.config["SPOTIPY_CLIENT_SECRET"],
+        redirect_uri=app.config["SPOTIPY_REDIRECT_URI"],
+        scope=app.config["SCOPE"]
     )
-    scope = Scope(*scopes)
-    url = c.authorisation_url(scope)
+    url = auth_manager.get_authorize_url()
 
     # Code is the result of the redirect
     return redirect(url, code=302)
 
 
-@app.route('/callback/')
+@app.route("/callback/")
 def code_generation():
     """Generates token from code in browser"""
-    code = re.search(r'code=(.*)', request.environ['QUERY_STRING']).group(1)
-    c = Credentials(
-        app.config['CLIENT_ID'],
-        app.config['CLIENT_SECRET'],
-        app.config['REDIRECT_URI']
+    code = re.search(r"code=(.*)", request.environ["QUERY_STRING"]).group(1)
+    auth_manager = auth_manager=SpotifyOAuth(
+        client_id=app.config["SPOTIPY_CLIENT_ID"],
+        client_secret=app.config["SPOTIPY_CLIENT_SECRET"],
+        redirect_uri=app.config["SPOTIPY_REDIRECT_URI"],
+        scope=app.config["SCOPE"]
     )
-    scope = Scope(*scopes)
-    token = c.request_access_token(code, scope)
+    token = auth_manager.get_access_token()
+    s = Spotify(auth=token)
 
-    s = Spotify(token.access_token)
-
-    return render_template('callback.html')
+    return render_template("callback.html")
