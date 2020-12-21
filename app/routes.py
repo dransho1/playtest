@@ -53,7 +53,7 @@ def code_generation():
     user_info = sp.current_user()
 
     # Get the user's top track from their "Your Songs" list below popularity rank 10
-    least_popular = sp.get_least_popular_songs(rank=5)
+    least_popular = sp.get_least_popular_songs_ranked(rank=5)
 
     return render_template(
         "callback.html",

@@ -61,9 +61,15 @@ class HousSpotify(Spotify):
 
         return all_songs
 
-    def get_least_popular_songs(self, rank=10):
+    def get_least_popular_songs_ranked(self, rank=10):
         """
         Helper to return and sort songs by least popularity.
+
+        Args:
+            rank (int): Value determining popularity to filter
+
+        Returns:
+            (ListDict): Sorted/filtered ranking of songs
         """
         return sorted(
             filter(
