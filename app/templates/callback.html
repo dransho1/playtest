@@ -4,11 +4,15 @@
         <img id="avatar" width="200" src="{{ user_info.images[0].url }}" />
         <dl>
          <dt>Display name: {{ user_info.display_name }}</dt><dd></dd>
-         <dt>Username: {{ user_info.username }}</dt><dd></dd>
          <dt>Email: {{ user_info.email }}</dt><dd></dd>
          <dt><a href="{{ user_info.uri }}">Spotify URI</a></dt><dd></dd>
          <dt><a href="{{ user_info.external_urls.spotify }}">Page</a></dt><dd></dd>
         </dl>
+        <h2>Most "hip" songs (by popularity)</h2>
+        <h3>boy aren't you cool</h3>
+        {% for song in songs %}
+        <div><p><b>{{ song.track.name }} -- {{ song.track.artists[0].name }}:</b> {{ song.track.popularity }}</p></div>
+        {% endfor %}
         <p><a href="/">Log in again</a></p>
     </body>
 </html>

@@ -6,10 +6,10 @@ from flask import (
     session,
 )
 import re
-from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 
 from app import app
+from app.helpers import HousSpotify
 
 @app.route("/")
 def index():
@@ -40,7 +40,7 @@ def code_generation():
     Authenticates app via response URL assigned to app (in Spotify), allowing access to code
     and giving user information.
     """
-    sp = Spotify(
+    sp = HousSpotify(
         auth_manager=SpotifyOAuth(
             client_id=app.config["SPOTIPY_CLIENT_ID"],
             client_secret=app.config["SPOTIPY_CLIENT_SECRET"],
@@ -52,9 +52,11 @@ def code_generation():
     # Get some user information to display
     user_info = sp.current_user()
 
-    # Get the user's top track from their "Your Songs" list
+    # Get the user's top track from their "Your Songs" list below popularity rank 10
+    least_popular = sp.get_least_popular_songs(rank=5)
 
     return render_template(
         "callback.html",
-        user_info=user_info
+        user_info=user_info,
+        songs=least_popular
     )
